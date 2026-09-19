@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "jiaoxianting",
+  "slug": "jiaoxianting",
+  "title": "焦显庭 Wiki",
+  "subtitle": "人物数字档案",
+  "description": "收录故事、语录、图册与影像资料",
+  "logo": "/static/sakuya-logo.svg",
+  "theme": "archive",
+  "sections": [
+    {
+      "id": "story",
+      "name": "故事",
+      "icon": "book-open-text",
+      "type": "markdown",
+      "source": "pages/story.md"
+    },
+    {
+      "id": "quotes",
+      "name": "语录",
+      "icon": "message-square-quote",
+      "type": "quotes",
+      "source": "pages/quotes.md"
+    },
+    {
+      "id": "gallery",
+      "name": "图册",
+      "icon": "images",
+      "type": "gallery",
+      "source": "media/gallery"
+    },
+    {
+      "id": "video",
+      "name": "视频",
+      "icon": "clapperboard",
+      "type": "video",
+      "source": "media/video"
+    }
+  ]
+}

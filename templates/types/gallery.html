@@ -1,0 +1,2 @@
+{% if body['items'] %}<div class="gallery-grid">{% for item in body['items'] %}<button class="gallery-item" type="button" data-lightbox-src="{{ item.url }}" aria-label="查看图片 {{ item.name }}"><img src="{{ item.url }}" alt="{{ item.name }}" loading="lazy"><i data-lucide="maximize-2"></i></button>{% endfor %}</div>{% else %}<div class="empty">暂无图片</div>{% endif %}
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览"><button type="button" data-lightbox-close aria-label="关闭预览"><i data-lucide="x"></i></button><img src="" alt="放大预览"></div>

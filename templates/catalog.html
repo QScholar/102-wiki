@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ catalog.title }}{% endblock %}
+{% block body_class %}catalog-page{% endblock %}
+{% block content %}
+<main class="site-shell">
+  <nav class="topbar" aria-label="Wiki 导航">
+    <a class="brand" href="{{ site_url(trailing=true) }}"><img src="{{ asset('sakuya-logo.svg') }}" alt=""><span>YUNA<span class="brand-mark">WIKI</span></span></a>
+    <div class="wiki-actions"><a href="{{ home_url }}" class="back-link"><i data-lucide="arrow-left"></i>返回 YUNA102</a><button class="theme-toggle" type="button" data-theme-toggle><i data-lucide="monitor"></i><span>跟随系统</span></button></div>
+  </nav>
+  <header class="catalog-hero">
+    <p class="eyebrow">Digital archives / open index</p>
+    <h1>{{ catalog.title }}</h1>
+    <p>{{ catalog.description }}</p>
+  </header>
+  <section class="catalog-grid" aria-label="Wiki 目录">
+    {% for wiki in catalog.wikis %}
+    <a class="catalog-card" href="{{ site_url(wiki.slug, trailing=true) }}">
+      <span class="catalog-card-top"><span>{{ '%02d'|format(loop.index) }}</span>{% if wiki.featured %}<em>FEATURED</em>{% endif %}</span>
+      <img src="{{ asset(wiki.logo|replace('/static/', '')) }}" alt="">
+      <span class="catalog-card-copy"><strong>{{ wiki.title }}</strong><small>{{ wiki.subtitle }}</small><span>{{ wiki.description }}</span></span>
+      <i data-lucide="arrow-up-right"></i>
+    </a>
+    {% else %}
+    <div class="empty">暂无已启用的 Wiki</div>
+    {% endfor %}
+  </section>
+  <footer class="site-footer"><span>YUNA102 ARCHIVE</span><span>{{ catalog.wikis|length }} WIKI COLLECTIONS</span></footer>
+</main>
+{% endblock %}

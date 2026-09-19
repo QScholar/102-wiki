@@ -1,0 +1,1 @@
+{% if body['items'] %}<div class="video-grid">{% for item in body['items'] %}<article class="video-item"><div class="video-meta"><h3>{{ item.name }}</h3><i data-lucide="play"></i></div><video src="{{ item.url }}" controls playsinline preload="metadata"></video></article>{% endfor %}</div>{% else %}<div class="empty">暂无视频</div>{% endif %}

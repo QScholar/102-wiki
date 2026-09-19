@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f9fd">
+  <title>{% block title %}{{ catalog.title }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ asset('sakuya-logo.svg') }}">
+  <script>try{const t=localStorage.getItem('yuna-wiki-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+  <link rel="stylesheet" href="{{ asset('fonts/fonts.css') }}">
+  <link rel="stylesheet" href="{{ asset('wiki.css') }}">
+  <script src="{{ asset('vendor/lucide/lucide.min.js') }}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% block content %}{% endblock %}
+  <script src="{{ asset('wiki.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

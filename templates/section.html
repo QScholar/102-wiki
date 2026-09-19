@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ section.name }} — {{ wiki.title }}{% endblock %}
+{% block body_class %}wiki-inner{% endblock %}
+{% block content %}
+<main class="inner-wrap">
+  <a class="section-back" href="{{ wiki_url }}" target="_top"><i data-lucide="arrow-left"></i>{{ wiki.title }}</a>
+  <div class="inner-heading"><h1>{{ section.name }}</h1><span>{{ section.type }} · {{ section.id }}</span></div>
+  {% include body.template %}
+</main>
+{% endblock %}

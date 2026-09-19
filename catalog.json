@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "title": "YUNA102 Wiki",
+  "description": "YUNA102 数字档案与知识集合",
+  "wikis": [
+    {
+      "id": "jiaoxianting",
+      "directory": "content/jiaoxianting",
+      "enabled": true,
+      "featured": true
+    }
+  ]
+}

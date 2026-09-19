@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ wiki.title }} — {{ catalog.title }}{% endblock %}
+{% block body_class %}wiki-shell{% endblock %}
+{% block content %}
+<main class="site-shell">
+  <nav class="topbar" aria-label="Wiki 导航">
+    <a class="brand" href="{{ site_url(trailing=true) }}"><img src="{{ asset('sakuya-logo.svg') }}" alt=""><span>YUNA<span class="brand-mark">WIKI</span></span></a>
+    <div class="wiki-actions"><a href="{{ site_url(trailing=true) }}" class="back-link"><i data-lucide="library"></i>全部 Wiki</a><button class="theme-toggle" type="button" data-theme-toggle><i data-lucide="monitor"></i><span>跟随系统</span></button></div>
+  </nav>
+  <header class="wiki-hero">
+    <div><p class="eyebrow">Personal digital archive</p><h1 class="wiki-title">{{ wiki.title|replace(' Wiki', '') }}<span>WIKI</span></h1></div>
+    <div class="wiki-aside"><span class="lock"><i data-lucide="archive"></i>{{ wiki.subtitle }}</span><div>{{ wiki.description }}。通过索引进入各栏目。</div></div>
+    <div class="wiki-emblem"><img src="{{ logo_url }}" alt="{{ wiki.title }} Logo"></div>
+  </header>
+  <section class="wiki-workspace">
+    <div class="wiki-tabs" role="tablist" aria-label="Wiki 栏目">
+      {% for section in sections %}<button class="wiki-tab{% if loop.first %} active{% endif %}" data-tab="{{ section.id }}" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}"><i data-lucide="{{ section.icon }}"></i>{{ section.name }}<span class="tab-no">{{ '%02d'|format(loop.index) }}</span></button>{% endfor %}
+    </div>
+    <div>{% for section in sections %}<div class="wiki-panel{% if loop.first %} active{% endif %}" id="panel-{{ section.id }}" role="tabpanel"><iframe src="{{ section.url }}" title="{{ section.name }}板块" loading="{{ 'eager' if loop.first else 'lazy' }}"></iframe></div>{% endfor %}</div>
+  </section>
+  <footer class="site-footer"><span>YUNA102 ARCHIVE</span><span>{{ wiki.title }}</span></footer>
+</main>
+{% endblock %}
+{% block scripts %}<script>document.querySelectorAll('.wiki-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.wiki-tab').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});document.querySelectorAll('.wiki-panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');tab.setAttribute('aria-selected','true');document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active')}));</script>{% endblock %}
