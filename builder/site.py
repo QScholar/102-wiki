@@ -135,11 +135,22 @@ class WikiRepository:
         for key in ("title", "subtitle", "description", "logo", "theme"):
             _required_text(config, key, context)
         logo = config["logo"]
-        if not logo.startswith("/static/") or ".." in PurePosixPath(logo).parts:
-            raise ConfigError(f"{context} 的 logo 必须指向 /static/ 内的资源")
-        logo_file = _safe_path(self.root / "static", logo.removeprefix("/static/"), f"{context}.logo")
+        if logo.startswith("/static/"):
+            logo_file = _safe_path(
+                self.root / "static",
+                logo.removeprefix("/static/"),
+                f"{context}.logo",
+            )
+        elif logo.startswith("media/"):
+            logo_file = _safe_path(wiki_dir, logo, f"{context}.logo")
+        else:
+            raise ConfigError(
+                f"{context} 的 logo 必须指向 /static/ 或当前 Wiki 的 media/ 资源"
+            )
         if not logo_file.is_file():
             raise ConfigError(f"Logo 文件不存在：{logo}")
+        if logo_file.suffix.lower() not in IMAGE_SUFFIXES | {".svg"}:
+            raise ConfigError(f"Logo 必须是受支持的图片：{logo}")
 
         sections = config.get("sections")
         if not isinstance(sections, list) or not sections:
@@ -195,7 +206,11 @@ class SiteRenderer:
             trim_blocks=True,
             lstrip_blocks=True,
         )
-        self.environment.globals.update(asset=self.asset, site_url=self.site_url)
+        self.environment.globals.update(
+            asset=self.asset,
+            site_url=self.site_url,
+            wiki_logo=self._logo_url,
+        )
 
     def site_url(self, *parts: str, trailing: bool = False) -> str:
         encoded_parts: list[str] = []
@@ -295,7 +310,10 @@ class SiteRenderer:
         return re.sub(r'(<img\b[^>]*\bsrc=")([^"]+)(")', replace, html, flags=re.IGNORECASE)
 
     def _logo_url(self, wiki: dict[str, Any]) -> str:
-        return self.asset(wiki["logo"].removeprefix("/static/"))
+        logo = wiki["logo"]
+        if logo.startswith("/static/"):
+            return self.asset(logo.removeprefix("/static/"))
+        return self.site_url(wiki["slug"], logo)
 
     def _template(self, name: str, **context: Any) -> str:
         return self.environment.get_template(name).render(**context)

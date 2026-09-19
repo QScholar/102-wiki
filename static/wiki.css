@@ -35,7 +35,7 @@ a { color:inherit; }
 .catalog-card-top { position:absolute; left:28px; right:28px; top:24px; display:flex; justify-content:space-between; color:var(--dim); font-size:.56rem; font-weight:800; letter-spacing:.13em; }
 .catalog-card-top em { color:var(--pink); font-style:normal; }
 .catalog-card:hover .catalog-card-top,.catalog-card:hover .catalog-card-top em { color:rgba(255,255,255,.75); }
-.catalog-card img { width:110px; padding:5px; background:#fff; box-shadow:7px 7px 0 var(--wine); }
+.catalog-card img { width:110px; aspect-ratio:4/5; object-fit:cover; object-position:center 35%; padding:5px; background:#fff; box-shadow:7px 7px 0 var(--wine); }
 .catalog-card-copy strong,.catalog-card-copy small,.catalog-card-copy span { display:block; }
 .catalog-card-copy strong { font-size:1.65rem; line-height:1.1; letter-spacing:-.035em; }
 .catalog-card-copy small { margin-top:8px; color:var(--pink); font-weight:800; }
@@ -50,7 +50,7 @@ a { color:inherit; }
 .wiki-aside .lock { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; color:var(--pink); font-weight:800; }
 .wiki-aside svg { width:16px; }
 .wiki-emblem { position:relative; padding:7px; background:white; box-shadow:10px 10px 0 var(--wine); }
-.wiki-emblem img { display:block; width:100%; }
+.wiki-emblem img { display:block; width:100%; aspect-ratio:4/5; object-fit:cover; object-position:center 35%; }
 .wiki-workspace { display:grid; grid-template-columns:245px minmax(0,1fr); min-height:70vh; border-top:1px solid var(--line); }
 .wiki-tabs { padding:38px 28px 38px 0; border-right:1px solid var(--line); }
 .wiki-tab { width:100%; display:flex; align-items:center; gap:12px; padding:15px 12px; color:var(--muted); background:none; border:0; text-align:left; cursor:pointer; font-weight:800; font-size:.78rem; transition:.25s; }

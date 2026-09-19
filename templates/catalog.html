@@ -16,7 +16,7 @@
     {% for wiki in catalog.wikis %}
     <a class="catalog-card" href="{{ site_url(wiki.slug, trailing=true) }}">
       <span class="catalog-card-top"><span>{{ '%02d'|format(loop.index) }}</span>{% if wiki.featured %}<em>FEATURED</em>{% endif %}</span>
-      <img src="{{ asset(wiki.logo|replace('/static/', '')) }}" alt="">
+      <img src="{{ wiki_logo(wiki) }}" alt="{{ wiki.title }}封面">
       <span class="catalog-card-copy"><strong>{{ wiki.title }}</strong><small>{{ wiki.subtitle }}</small><span>{{ wiki.description }}</span></span>
       <i data-lucide="arrow-up-right"></i>
     </a>

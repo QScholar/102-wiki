@@ -18,6 +18,17 @@ class BuilderTests(unittest.TestCase):
         catalog = self.repository.load()
         self.assertEqual(["jiaoxianting"], [wiki["slug"] for wiki in catalog["wikis"]])
         self.assertEqual(4, len(catalog["wikis"][0]["sections"]))
+        self.assertEqual(
+            "media/gallery/IMG_20251021_200058.jpg",
+            catalog["wikis"][0]["logo"],
+        )
+
+    def test_catalog_uses_configured_wiki_media_as_cover(self) -> None:
+        rendered = SiteRenderer(self.repository, base_url="/preview/").render_catalog()
+        self.assertIn(
+            "/preview/jiaoxianting/media/gallery/IMG_20251021_200058.jpg",
+            rendered,
+        )
 
     def test_urls_support_project_path_and_unicode_media(self) -> None:
         renderer = SiteRenderer(self.repository, base_url="https://example.github.io/yuna-wiki/")
