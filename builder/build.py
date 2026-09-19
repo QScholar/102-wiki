@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import re
 import shutil
 
 from builder import SiteRenderer, WikiRepository
 
 
 ROOT = Path(__file__).resolve().parents[1]
+DOMAIN_RE = re.compile(r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
 
 
 def write_page(output: Path, relative: Path, html: str) -> None:
@@ -36,8 +38,13 @@ def build(output: Path, base_url: str, custom_domain: str | None = None) -> None
 
     shutil.copytree(ROOT / "static", output / "static", dirs_exist_ok=True)
     (output / ".nojekyll").touch()
+    if custom_domain is None and (ROOT / "CNAME").is_file():
+        custom_domain = (ROOT / "CNAME").read_text(encoding="utf-8").strip()
     if custom_domain:
-        (output / "CNAME").write_text(custom_domain.strip() + "\n", encoding="utf-8")
+        custom_domain = custom_domain.strip().lower()
+        if not DOMAIN_RE.fullmatch(custom_domain):
+            raise ValueError(f"Invalid custom domain: {custom_domain!r}")
+        (output / "CNAME").write_text(custom_domain + "\n", encoding="utf-8")
     print(f"Built {len(catalog['wikis'])} Wiki(s) in {output}")
 
 

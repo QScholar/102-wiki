@@ -14,6 +14,7 @@ content/<wiki>/media/gallery/      # 图册
 content/<wiki>/media/markdown/     # 正文图片
 content/<wiki>/media/video/        # 视频
 builder/                           # 校验器和静态构建器
+scripts/sync.sh                    # 校验后快进的安全同步脚本
 templates/                         # 独立 Jinja 模板
 static/                            # 独立前端资源
 .github/workflows/pages.yml        # GitHub Pages 自动部署
@@ -55,11 +56,22 @@ git commit -m "更新 Wiki 内容"
 git push origin main
 ```
 
+服务器同步远端内容时使用：
+
+```bash
+./scripts/sync.sh
+```
+
+脚本会拒绝未提交修改和分叉分支，先在临时 Git 工作树校验远端内容，只有校验通过后才快进本地 `main`。同步失败不会替换当前可用内容。
+
 仓库 Pages 的 Source 应选择 **GitHub Actions**。推送后，工作流会使用官方 Pages Actions 构建和部署。自定义域名准备完成后，在仓库 **Settings → Pages → Custom domain** 中填写 `102wiki.yuna.team`；域名设置不影响默认 `github.io` 地址构建。
+
+仓库根目录的 `CNAME` 会由构建器校验并复制到 Pages 产物，当前值为 `102wiki.yuna.team`。
 
 ## 内容约束
 
 - 图册支持 PNG、JPG、JPEG、GIF、WebP、BMP；视频支持 MP4、WebM、OGG、MOV、AVI。
 - Markdown 正文图片应存放在当前 Wiki 的 `media/markdown/`，并用相对路径引用。
+- 所有外部链接和外部图片必须使用 HTTPS。
 - 普通 Git 单文件不得超过 100 MiB；更大的媒体需使用 Git LFS 或外部对象存储。
 - 禁止提交 `.env`、令牌、密码、数据库、隧道配置或其他服务器秘密。

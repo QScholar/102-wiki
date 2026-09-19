@@ -18,6 +18,13 @@ IDENTIFIER_RE = SLUG_RE
 SUPPORTED_TYPES = {"markdown", "quotes", "gallery", "video"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 VIDEO_SUFFIXES = {".mp4", ".webm", ".ogg", ".mov", ".avi"}
+MAX_GIT_FILE_BYTES = 100 * 1024 * 1024
+SECTION_RENDERERS = {
+    "markdown": "_render_markdown",
+    "quotes": "_render_quotes",
+    "gallery": "_render_gallery",
+    "video": "_render_video",
+}
 
 
 class ConfigError(ValueError):
@@ -92,10 +99,10 @@ class WikiRepository:
                 raise ConfigError(f"{context}.featured 必须是布尔值")
             directory = _required_text(registration, "directory", context)
             wiki_dir = _safe_path(self.root, directory, f"{context}.directory")
-            if not wiki_dir.is_dir():
-                raise ConfigError(f"Wiki 目录不存在：{directory}")
             if not registration["enabled"]:
                 continue
+            if not wiki_dir.is_dir():
+                raise ConfigError(f"Wiki 目录不存在：{directory}")
 
             config_path = wiki_dir / "wiki.json"
             config = _read_json(config_path)
@@ -151,6 +158,7 @@ class WikiRepository:
             raise ConfigError(f"Logo 文件不存在：{logo}")
         if logo_file.suffix.lower() not in IMAGE_SUFFIXES | {".svg"}:
             raise ConfigError(f"Logo 必须是受支持的图片：{logo}")
+        self._validate_media_files(wiki_dir, context)
 
         sections = config.get("sections")
         if not isinstance(sections, list) or not sections:
@@ -177,6 +185,21 @@ class WikiRepository:
                 raise ConfigError(f"栏目源文件不存在：{section['source']}")
             if not should_be_file and not source.is_dir():
                 raise ConfigError(f"栏目源目录不存在：{section['source']}")
+
+    def _validate_media_files(self, wiki_dir: Path, context: str) -> None:
+        media_dir = wiki_dir / "media"
+        if not media_dir.is_dir():
+            raise ConfigError(f"{context} 缺少 media 目录")
+        for path in media_dir.rglob("*"):
+            if not path.is_file():
+                continue
+            try:
+                path.resolve().relative_to(media_dir.resolve())
+            except ValueError as exc:
+                raise ConfigError(f"媒体文件越出当前 Wiki：{path}") from exc
+            if path.stat().st_size > MAX_GIT_FILE_BYTES:
+                relative = path.relative_to(wiki_dir).as_posix()
+                raise ConfigError(f"媒体文件超过 GitHub 100 MiB 限制：{relative}")
 
     def wiki(self, slug: str) -> tuple[dict[str, Any], dict[str, Any]]:
         catalog = self.load()
@@ -250,7 +273,7 @@ class SiteRenderer:
         section = next((item for item in wiki["sections"] if item["id"] == section_id), None)
         if section is None:
             raise KeyError(section_id)
-        handler = getattr(self, f"_render_{section['type']}")
+        handler = getattr(self, SECTION_RENDERERS[section["type"]])
         body = handler(wiki, section)
         return self._template(
             "section.html",
@@ -266,12 +289,14 @@ class SiteRenderer:
         source = _safe_path(wiki["path"], section["source"], "section.source")
         html = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["extra"])
         html = self._rewrite_markdown_images(html, source, wiki)
+        self._validate_external_links(html, source)
         return {"template": "types/markdown.html", "html": html}
 
     def _render_quotes(self, wiki: dict[str, Any], section: dict[str, Any]) -> dict[str, Any]:
         source = _safe_path(wiki["path"], section["source"], "section.source")
         html = markdown.markdown(source.read_text(encoding="utf-8"), extensions=["extra"])
         html = self._rewrite_markdown_images(html, source, wiki)
+        self._validate_external_links(html, source)
         html = re.sub(r"<p>(.+?)</p>", r'<div class="quote-item">\1</div>', html, flags=re.DOTALL)
         return {"template": "types/quotes.html", "html": html}
 
@@ -308,6 +333,10 @@ class SiteRenderer:
             return f"{match.group(1)}{rewritten}{match.group(3)}"
 
         return re.sub(r'(<img\b[^>]*\bsrc=")([^"]+)(")', replace, html, flags=re.IGNORECASE)
+
+    def _validate_external_links(self, html: str, source: Path) -> None:
+        if re.search(r"\b(?:href|src)\s*=\s*['\"]http://", html, flags=re.IGNORECASE):
+            raise ConfigError(f"外部链接必须使用 HTTPS：{source}")
 
     def _logo_url(self, wiki: dict[str, Any]) -> str:
         logo = wiki["logo"]

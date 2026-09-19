@@ -45,6 +45,7 @@ class BuilderTests(unittest.TestCase):
             build(output, "/preview/")
             expected = [
                 output / "index.html",
+                output / "CNAME",
                 output / "jiaoxianting/index.html",
                 output / "jiaoxianting/story/index.html",
                 output / "jiaoxianting/quotes/index.html",
@@ -58,6 +59,10 @@ class BuilderTests(unittest.TestCase):
             rendered = (output / "jiaoxianting/gallery/index.html").read_text(encoding="utf-8")
             self.assertIn("/preview/jiaoxianting/media/gallery/", rendered)
             self.assertNotIn(str(ROOT), rendered)
+            self.assertEqual(
+                "102wiki.yuna.team\n",
+                (output / "CNAME").read_text(encoding="utf-8"),
+            )
 
     def test_new_wiki_needs_only_content_and_registration(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -67,6 +72,7 @@ class BuilderTests(unittest.TestCase):
             for slug in ("first", "second"):
                 wiki_dir = root / "content" / slug
                 (wiki_dir / "pages").mkdir(parents=True)
+                (wiki_dir / "media").mkdir()
                 (wiki_dir / "pages/story.md").write_text(f"# {slug}", encoding="utf-8")
                 (wiki_dir / "wiki.json").write_text(json.dumps({
                     "schema_version": 1,
@@ -98,6 +104,45 @@ class BuilderTests(unittest.TestCase):
                 "title": "Test catalog",
                 "description": "Test",
                 "wikis": [{"id": "bad", "directory": "../outside", "enabled": True}],
+            }), encoding="utf-8")
+            with self.assertRaises(ConfigError):
+                WikiRepository(root).load()
+
+    def test_insecure_markdown_link_is_rejected(self) -> None:
+        source = ROOT / "content/jiaoxianting/pages/story.md"
+        wiki = self.repository.load()["wikis"][0]
+        renderer = SiteRenderer(self.repository)
+        html = '<p><a href="http://example.com">insecure</a></p>'
+        with self.assertRaises(ConfigError):
+            renderer._validate_external_links(html, source)
+
+    def test_oversized_media_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "static").mkdir()
+            (root / "static/logo.svg").write_text("<svg/>", encoding="utf-8")
+            wiki_dir = root / "content/test"
+            (wiki_dir / "pages").mkdir(parents=True)
+            (wiki_dir / "media/gallery").mkdir(parents=True)
+            (wiki_dir / "pages/story.md").write_text("# Test", encoding="utf-8")
+            with (wiki_dir / "media/gallery/too-large.jpg").open("wb") as file:
+                file.truncate(100 * 1024 * 1024 + 1)
+            (wiki_dir / "wiki.json").write_text(json.dumps({
+                "schema_version": 1,
+                "id": "test",
+                "slug": "test",
+                "title": "Test",
+                "subtitle": "Test",
+                "description": "Test",
+                "logo": "/static/logo.svg",
+                "theme": "archive",
+                "sections": [{"id": "story", "name": "Story", "icon": "book", "type": "markdown", "source": "pages/story.md"}],
+            }), encoding="utf-8")
+            (root / "catalog.json").write_text(json.dumps({
+                "schema_version": 1,
+                "title": "Test",
+                "description": "Test",
+                "wikis": [{"id": "test", "directory": "content/test", "enabled": True}],
             }), encoding="utf-8")
             with self.assertRaises(ConfigError):
                 WikiRepository(root).load()
