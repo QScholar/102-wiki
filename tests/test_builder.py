@@ -31,6 +31,13 @@ class BuilderTests(unittest.TestCase):
             "/preview/jiaoxianting/media/gallery/IMG_20251021_200058.jpg",
             rendered,
         )
+        self.assertIn('/preview/guide/', rendered)
+
+    def test_content_guide_renders_from_markdown(self) -> None:
+        rendered = SiteRenderer(self.repository, base_url="/preview/").render_guide()
+        self.assertIn("如何修改已有 Wiki", rendered)
+        self.assertIn("如何添加新栏目", rendered)
+        self.assertIn('/preview/', rendered)
 
     def test_urls_support_project_path_and_unicode_media(self) -> None:
         renderer = SiteRenderer(self.repository, base_url="https://example.github.io/yuna-wiki/")
@@ -46,6 +53,7 @@ class BuilderTests(unittest.TestCase):
             expected = [
                 output / "index.html",
                 output / "CNAME",
+                output / "guide/index.html",
                 output / "jiaoxianting/index.html",
                 output / "jiaoxianting/story/index.html",
                 output / "jiaoxianting/quotes/index.html",

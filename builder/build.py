@@ -28,6 +28,7 @@ def build(output: Path, base_url: str, custom_domain: str | None = None) -> None
         shutil.rmtree(output)
     output.mkdir(parents=True)
     write_page(output, Path(), renderer.render_catalog())
+    write_page(output, Path("guide"), renderer.render_guide())
 
     for wiki in catalog["wikis"]:
         slug = wiki["slug"]

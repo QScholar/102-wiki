@@ -19,6 +19,8 @@ SUPPORTED_TYPES = {"markdown", "quotes", "gallery", "video"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 VIDEO_SUFFIXES = {".mp4", ".webm", ".ogg", ".mov", ".avi"}
 MAX_GIT_FILE_BYTES = 100 * 1024 * 1024
+RESERVED_SLUGS = {"guide", "static"}
+GUIDE_SOURCE = Path("docs/content-guide.md")
 SECTION_RENDERERS = {
     "markdown": "_render_markdown",
     "quotes": "_render_quotes",
@@ -139,6 +141,8 @@ class WikiRepository:
         slug = _required_text(config, "slug", context)
         if not SLUG_RE.fullmatch(slug):
             raise ConfigError(f"{context} 的 slug 只能包含小写字母、数字和连字符")
+        if slug in RESERVED_SLUGS:
+            raise ConfigError(f"{context} 的 slug 使用了站点保留名称：{slug}")
         for key in ("title", "subtitle", "description", "logo", "theme"):
             _required_text(config, key, context)
         logo = config["logo"]
@@ -251,6 +255,24 @@ class SiteRenderer:
     def render_catalog(self) -> str:
         catalog = self.repository.load()
         return self._template("catalog.html", catalog=catalog, home_url=self.home_url)
+
+    def render_guide(self) -> str:
+        catalog = self.repository.load()
+        source = self.repository.root / GUIDE_SOURCE
+        if not source.is_file():
+            raise ConfigError(f"缺少 Wiki 内容维护指南：{source}")
+        html = markdown.markdown(
+            source.read_text(encoding="utf-8"),
+            extensions=["extra"],
+        )
+        self._validate_external_links(html, source)
+        return self._template(
+            "guide.html",
+            catalog=catalog,
+            guide_html=html,
+            catalog_url=self.site_url(trailing=True),
+            home_url=self.home_url,
+        )
 
     def render_wiki(self, slug: str) -> str:
         catalog, wiki = self.repository.wiki(slug)

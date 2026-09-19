@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}内容维护指南 — {{ catalog.title }}{% endblock %}
+{% block body_class %}guide-page{% endblock %}
+{% block content %}
+<main class="site-shell">
+  <nav class="topbar" aria-label="Wiki 导航">
+    <a class="brand" href="{{ catalog_url }}"><img src="{{ asset('sakuya-logo.svg') }}" alt=""><span>YUNA<span class="brand-mark">WIKI</span></span></a>
+    <div class="wiki-actions"><a href="{{ catalog_url }}" class="back-link"><i data-lucide="library"></i>全部 Wiki</a><button class="theme-toggle" type="button" data-theme-toggle><i data-lucide="monitor"></i><span>跟随系统</span></button></div>
+  </nav>
+  <header class="guide-hero">
+    <p class="eyebrow">Contributor guide / content workflow</p>
+    <h1>内容维护指南</h1>
+    <p>修改已有内容、上传媒体、添加栏目与发布更新。</p>
+  </header>
+  <article class="story-content guide-content">{{ guide_html|safe }}</article>
+  <footer class="site-footer"><span>YUNA102 ARCHIVE</span><span>WIKI CONTRIBUTOR GUIDE</span></footer>
+</main>
+{% endblock %}

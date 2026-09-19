@@ -18,6 +18,14 @@
       <figcaption><span>YUNA102 / WIKI IDENTITY</span><span>SAKUYA · 00</span></figcaption>
     </figure>
   </header>
+  <aside class="guide-callout" aria-labelledby="guide-title">
+    <div>
+      <p class="eyebrow">Contributor guide / content workflow</p>
+      <h2 id="guide-title">维护 Wiki</h2>
+      <p>了解如何修改单个 Wiki 的文字与媒体，以及如何只通过配置新增栏目。</p>
+    </div>
+    <a href="{{ site_url('guide', trailing=true) }}"><span>阅读编辑指南</span><i data-lucide="arrow-up-right"></i></a>
+  </aside>
   <section class="catalog-grid" aria-label="Wiki 目录">
     {% for wiki in catalog.wikis %}
     <a class="catalog-card" href="{{ site_url(wiki.slug, trailing=true) }}">

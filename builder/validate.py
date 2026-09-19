@@ -10,6 +10,7 @@ def main() -> None:
     catalog = repository.load()
     renderer = SiteRenderer(repository)
     renderer.render_catalog()
+    renderer.render_guide()
     for wiki in catalog["wikis"]:
         renderer.render_wiki(wiki["slug"])
         for section in wiki["sections"]:
