@@ -8,9 +8,15 @@
     <div class="wiki-actions"><a href="{{ home_url }}" class="back-link"><i data-lucide="arrow-left"></i>返回 YUNA102</a><button class="theme-toggle" type="button" data-theme-toggle><i data-lucide="monitor"></i><span>跟随系统</span></button></div>
   </nav>
   <header class="catalog-hero">
-    <p class="eyebrow">Digital archives / open index</p>
-    <h1>{{ catalog.title }}</h1>
-    <p>{{ catalog.description }}</p>
+    <div class="catalog-hero-copy">
+      <p class="eyebrow">Digital archives / open index</p>
+      <h1>{{ catalog.title }}</h1>
+      <p>{{ catalog.description }}</p>
+    </div>
+    <figure class="catalog-cover">
+      <img src="{{ asset('sakuya-logo.svg') }}" alt="YUNA102 Wiki 咲夜封面">
+      <figcaption><span>YUNA102 / WIKI IDENTITY</span><span>SAKUYA · 00</span></figcaption>
+    </figure>
   </header>
   <section class="catalog-grid" aria-label="Wiki 目录">
     {% for wiki in catalog.wikis %}

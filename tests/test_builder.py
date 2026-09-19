@@ -25,6 +25,8 @@ class BuilderTests(unittest.TestCase):
 
     def test_catalog_uses_configured_wiki_media_as_cover(self) -> None:
         rendered = SiteRenderer(self.repository, base_url="/preview/").render_catalog()
+        self.assertIn('class="catalog-cover"', rendered)
+        self.assertIn('/preview/static/sakuya-logo.svg', rendered)
         self.assertIn(
             "/preview/jiaoxianting/media/gallery/IMG_20251021_200058.jpg",
             rendered,
