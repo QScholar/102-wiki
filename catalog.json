@@ -8,6 +8,12 @@
       "directory": "content/jiaoxianting",
       "enabled": true,
       "featured": true
+    }，
+    {
+      "id": "xiyuyang",
+      "directory": "content/xiyuyang",
+      "enabled": true,
+      "featured": false
     }
   ]
 }
